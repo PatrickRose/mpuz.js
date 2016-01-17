@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="The emacs multiplication puzzle">
+    <meta name="author" content="Patrick Rose">
+
+    <title>Mpuz.html</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="/styles.css">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+         <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+         <![endif]-->
+  </head>
+
+  <body>
+
+    <!-- Begin page content -->
+    <div class="container">
+      <div class="page-header">
+        <h1>Mpuz.html</h1>
+      </div>
+      <p class="lead">A reimplementation of <a href="https://github.com/emacs-mirror/emacs/blob/master/lisp/play/mpuz.el">mpuz.el</a> in HTML and JS</p>
+      <noscript>
+        You don't have javascript turned on. This will not work. There are no ads or tracking involved in this. I load jQuery via a CDN and the rest is just a JS implentation of mpuz.el. Feel free to read the code if you don't believe me!
+      </noscript>
+      <div id="status-bar">
+        <p id="status">
+          Click a digit to make a guess
+        </p>
+        <button class="btn btn-default" id="restart">Regenerate Puzzle</button>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <h2>Game</h2>
+          <table id="game" style="display:none">
+            <tbody>
+              <tr id="multiply-num-1">
+                <td colspan="3"></td>
+                <td class="hundreds digit">1</td>
+                <td class="tens digit">1</td>
+                <td class="singles digit">1</td>
+              </tr>
+              <tr id="multiply-num-2">
+                <td colspan="3" class="operation">x</td>
+                <td></td>
+                <td class="tens digit">1</td>
+                <td class="singles digit">1</td>
+              </tr>
+              <tr id="add-num-1">
+                <td colspan="2"></td>
+                <td class="thousands digit">1</td>
+                <td class="hundreds digit">1</td>
+                <td class="tens digit">1</td>
+                <td class="singles digit">1</td>
+              </tr>
+              <tr id="add-num-2">
+                <td class="operation digit">+</td>
+                <td class="thousands digit">1</td>
+                <td class="hundreds digit">1</td>
+                <td class="tens digit">1</td>
+                <td class="singles digit" colspan="2">1</td>
+              </tr>
+              <tr id="result-num">
+                <td class="operation">=</td>
+                <td class="ten-thousands digit">1</td>
+                <td class="thousands digit">1</td>
+                <td class="hundreds digit">1</td>
+                <td class="tens digit">1</td>
+                <td class="singles digit">1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-6">
+          <h2>Guesses</h2>
+          <table id="guesses" class="table" style="display:none;">
+            <thead>
+              <tr>
+                <th></th>
+                <th>0</th>
+                <th>1</th>
+                <th>2</th>
+                <th>3</th>
+                <th>4</th>
+                <th>5</th>
+                <th>6</th>
+                <th>7</th>
+                <th>8</th>
+                <th>9</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="letter-A">
+                <th>A</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+              <tr class="letter-B">
+                <th>B</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+              <tr class="letter-C">
+                <th>C</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+              <tr class="letter-D">
+                <th>D</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+              <tr class="letter-E">
+                <th>E</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+              <tr class="letter-F">
+                <th>F</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+              <tr class="letter-G">
+                <th>G</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+              <tr class="letter-H">
+                <th>H</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+              <tr class="letter-J">
+                <th>J</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+              <tr class="letter-K">
+                <th>K</th>
+                <td class="digit-0"></td>
+                <td class="digit-1"></td>
+                <td class="digit-2"></td>
+                <td class="digit-3"></td>
+                <td class="digit-4"></td>
+                <td class="digit-5"></td>
+                <td class="digit-6"></td>
+                <td class="digit-7"></td>
+                <td class="digit-8"></td>
+                <td class="digit-9"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <p class="text-muted">Made by <a href="http://twitter.com/DrugCrazed">Patrick Rose</a></p>
+      </div>
+    </footer>
+
+
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script>
+     /*!
+      * IE10 viewport hack for Surface/desktop Windows 8 bug
+      * Copyright 2014-2015 Twitter, Inc.
+      * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+      */
+
+     // See the Getting Started docs for more information:
+     // http://getbootstrap.com/getting-started/#support-ie10-width
+
+     (function () {
+       'use strict';
+
+       if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+         var msViewportStyle = document.createElement('style')
+           msViewportStyle.appendChild(
+             document.createTextNode(
+               '@-ms-viewport{width:auto!important}'
+             )
+           )
+           document.querySelector('head').appendChild(msViewportStyle)
+       }
+
+     })();
+    </script>
+    <script src="/mpuz.js"></script>
+    <script>
+     $(function() {
+       mpuz.init();
+       $(".digit").click(function() {mpuz.beginGuess($(this).attr('data-letter'))});
+       $(document).keypress(function(event) {mpuz.handleKeyPress(event);});
+       $("button#restart").click(function() {mpuz.init()});
+     })
+    </script>
+  </body>
+</html>
