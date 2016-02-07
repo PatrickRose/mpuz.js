@@ -1,4 +1,6 @@
-mpuz = {
+'use strict';
+
+var mpuz = {
     _firstMultiplyNum: 0,
     _secondMultiplyNum: 0,
     _firstAddNum: 0,
@@ -12,12 +14,15 @@ mpuz = {
 
     _guesses: {},
 
-    init: function() {
+    _gameHasBeenSolved: false,
+
+    init: function () {
         // Hide it while we fix things
         this._makingGuess = null;
         $('table').hide();
+        this._gameHasBeenSolved = false;
         // First, let's shuffle up the numbers 0-9
-        var numbers = this.shuffle([0,1,2,3,4,5,6,7,8,9]);
+        var numbers = this.shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
 
         // Now set each of those
         this._vals = {
@@ -33,18 +38,17 @@ mpuz = {
             'K': numbers[9]
         };
 
-        this._inverse = {
-            [numbers[0]]: 'A',
-            [numbers[1]]: 'B',
-            [numbers[2]]: 'C',
-            [numbers[3]]: 'D',
-            [numbers[4]]: 'E',
-            [numbers[5]]: 'F',
-            [numbers[6]]: 'G',
-            [numbers[7]]: 'H',
-            [numbers[8]]: 'J',
-            [numbers[9]]: 'K'
-        };
+        this._inverse = {};
+        this._inverse[numbers[0]] = 'A';
+        this._inverse[numbers[1]] = 'B';
+        this._inverse[numbers[2]] = 'C';
+        this._inverse[numbers[3]] = 'D';
+        this._inverse[numbers[4]] = 'E';
+        this._inverse[numbers[5]] = 'F';
+        this._inverse[numbers[6]] = 'G';
+        this._inverse[numbers[7]] = 'H';
+        this._inverse[numbers[8]] = 'J';
+        this._inverse[numbers[9]] = 'K';
 
         this._solved = {
             'A': false,
@@ -211,8 +215,8 @@ mpuz = {
             this._firstAddNum = secondDigitForSecond * this._firstMultiplyNum;
             this._secondAddNum = firstDigitForSecond * this._firstMultiplyNum;
             // Make sure they don't begin with 0
-            isValid = Math.floor(this._firstAddNum/1000) != 0 &&
-                Math.floor(this._secondAddNum/1000) != 0;
+            isValid = Math.floor(this._firstAddNum / 1000) != 0 &&
+                Math.floor(this._secondAddNum / 1000) != 0;
         }
         while (!isValid);
 
@@ -225,7 +229,7 @@ mpuz = {
         $('table#guesses td').html('');
     },
 
-    _drawNumbers: function() {
+    _drawNumbers: function () {
         // Initialise each of these
         this._drawNumber($('table#game tr#multiply-num-1'), this._firstMultiplyNum);
         this._drawNumber($('table#game tr#multiply-num-2'), this._secondMultiplyNum);
@@ -234,15 +238,15 @@ mpuz = {
         this._drawNumber($('table#game tr#result-num'), this._resultNum);
     },
 
-    _drawNumber: function($tableRow, number) {
-        this._drawDigit($tableRow.find('.ten-thousands'), Math.floor(number/10000) % 10);
-        this._drawDigit($tableRow.find('.thousands'), Math.floor(number/1000) % 10);
-        this._drawDigit($tableRow.find('.hundreds'), Math.floor(number/100) % 10);
-        this._drawDigit($tableRow.find('.tens'), Math.floor(number/10) % 10);
+    _drawNumber: function ($tableRow, number) {
+        this._drawDigit($tableRow.find('.ten-thousands'), Math.floor(number / 10000) % 10);
+        this._drawDigit($tableRow.find('.thousands'), Math.floor(number / 1000) % 10);
+        this._drawDigit($tableRow.find('.hundreds'), Math.floor(number / 100) % 10);
+        this._drawDigit($tableRow.find('.tens'), Math.floor(number / 10) % 10);
         this._drawDigit($tableRow.find('.singles'), Math.floor(number % 10));
     },
 
-    _drawDigit: function($tableCell, number) {
+    _drawDigit: function ($tableCell, number) {
         var letterForNumber = this._inverse[number];
 
         // This cell doesn't exist
@@ -286,6 +290,11 @@ mpuz = {
         // Reset the guess making (in case they select a letter already set)
         this._makingGuess = null;
 
+        if (this._gameHasBeenSolved) {
+            this._updateStatus('Game solved! Hit "Regenerate Puzzle" to start again!');
+            return;
+        }
+
         // Make sure there is an element with that letter
         if ($("table#game [data-letter='" + letterGuess + "']").length == 0) {
             this._updateStatus(letterGuess + ' is not used in this puzzle');
@@ -308,24 +317,47 @@ mpuz = {
         $("#status-bar #status").html(newStatus);
     },
 
-    handleKeyPress(event) {
+    handleKeyPress: function (event) {
         // First, are we even making a guess?
         if (this._makingGuess === null) {
             // They might be starting a new guess
             var key = event.key.toUpperCase();
-            if ($.inArray(key, ["A","B","C","D","E","F","G","H","J","K"]) != -1) {
+            if ($.inArray(key, ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"]) != -1) {
                 this.beginGuess(key);
             }
             return;
         }
 
         // Check if we have 0-9
-        if ($.inArray(event.key, ["0","1","2","3","4","5","6","7","8","9"]) == -1) {
+        if ($.inArray(event.key, ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]) == -1) {
             this._updateStatus('You need to press a number from 0-9. You are still guessing for the letter ' + this._makingGuess);
             return;
         }
 
         this._makeGuess(this._makingGuess, event.key);
+    },
+
+    _testIfGameSolved: function () {
+        var letters = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"];
+
+        for (var i = 0; i < letters.length; i++) {
+            var letter = letters[i];
+            if (this._solved[letter])
+            {
+                // This letter has been solved, so it's fine
+                continue;
+            }
+
+            // Is this letter in use?
+            if ($("table#game [data-letter='" + letter + "']").length != 0) {
+                this._gameHasBeenSolved = false;
+
+                return;
+            }
+        }
+
+        this._gameHasBeenSolved = true;
+        this._updateStatus('Game solved! Hit "Regenerate Puzzle" to start again!');
     },
 
     _makeGuess: function (letter, number) {
@@ -341,14 +373,24 @@ mpuz = {
             return;
         }
 
-        // Now, check if they were right
         if (this._inverse[number] == letter) {
             // Success!
             this._solved[number] = true;
             this._solved[letter] = true;
             this._drawNumbers();
             this._updateStatus("That's correct! " + letter + " is " + number);
-            this._guesses[letter] = {0:true,1:true,2:true,3:true,4:true,5:true,6:true,7:true,8:true,9:true};
+            this._guesses[letter] = {
+                0: true,
+                1: true,
+                2: true,
+                3: true,
+                4: true,
+                5: true,
+                6: true,
+                7: true,
+                8: true,
+                9: true
+            };
             this._guesses['A'][number] = true;
             this._guesses['B'][number] = true;
             this._guesses['C'][number] = true;
@@ -359,6 +401,7 @@ mpuz = {
             this._guesses['H'][number] = true;
             this._guesses['J'][number] = true;
             this._guesses['K'][number] = true;
+            this._testIfGameSolved();
         } else {
             this._updateStatus("That's incorrect! " + letter + " is not " + number);
             this._guesses[letter][number] = true;
@@ -368,7 +411,7 @@ mpuz = {
         this._drawGuessTable();
     },
 
-    _drawGuessTable: function() {
+    _drawGuessTable: function () {
         for (var letter in this._guesses) {
             if (this._guesses.hasOwnProperty(letter)) {
                 for (var number in this._guesses[letter]) {
