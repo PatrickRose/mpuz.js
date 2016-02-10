@@ -36,7 +36,25 @@
         <p id="status">
           Click a digit to make a guess
         </p>
-        <button class="btn btn-default" id="restart">Regenerate Puzzle</button>
+        <div class="btn-group" data-toggle="buttons" role="group" id="difficulty">
+          <button class="btn btn-default" id="restart">Regenerate Puzzle</button>
+          <label class="btn btn-default active" data-difficulty="easy">
+            <input type="radio" name="level" id="easy" autocomplete="off" checked>
+            Easy (5 digits)
+          </label>
+          <label class="btn btn-default" data-difficulty="medium">
+            <input type="radio" name="level" id="medium" autocomplete="off">
+            Medium (6 digits)
+          </label>
+          <label class="btn btn-default" data-difficulty="hard">
+            <input type="radio" name="level" id="hard" autocomplete="off">
+            Hard (7+ digits)
+          </label>
+          <label class="btn btn-default" data-difficulty="random">
+            <input type="radio" name="level" id="random" autocomplete="off">
+            Random Difficulty
+          </label>
+        </div>
       </div>
       <div class="row">
         <div class="col-md-6">
@@ -243,6 +261,7 @@
 
 
     <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script>
      /*!
       * IE10 viewport hack for Surface/desktop Windows 8 bug
@@ -254,27 +273,28 @@
      // http://getbootstrap.com/getting-started/#support-ie10-width
 
      (function () {
-       'use strict';
+         'use strict';
 
-       if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
-         var msViewportStyle = document.createElement('style')
-           msViewportStyle.appendChild(
-             document.createTextNode(
-               '@-ms-viewport{width:auto!important}'
-             )
-           )
-           document.querySelector('head').appendChild(msViewportStyle)
-       }
+         if (navigator.userAgent.match(/IEMobile\/10\.0/)) {
+             var msViewportStyle = document.createElement('style')
+                 msViewportStyle.appendChild(
+                     document.createTextNode(
+                         '@-ms-viewport{width:auto!important}'
+                     )
+                 )
+                 document.querySelector('head').appendChild(msViewportStyle)
+         }
 
      })();
     </script>
     <script src="/mpuz.js"></script>
     <script>
      $(function() {
-       mpuz.init();
-       $(".digit").click(function() {mpuz.beginGuess($(this).attr('data-letter'))});
-       $(document).keypress(function(event) {mpuz.handleKeyPress(event);});
-       $("button#restart").click(function() {mpuz.init()});
+         mpuz.init();
+         $(".digit").click(function() {mpuz.beginGuess($(this).attr('data-letter'))});
+         $(document).keypress(function(event) {mpuz.handleKeyPress(event);});
+         $("button#restart").click(function() {mpuz.init()});
+         $('#difficulty input').change(function(e) { mpuz.init() });
      })
     </script>
   </body>
